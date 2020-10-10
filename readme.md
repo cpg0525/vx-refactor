@@ -1,6 +1,6 @@
 - ##### 安装
 
-> npm install v-refactor or yarn add v-refactor；
+> npm install vx-refactor or yarn add vx-refactor；
 
 - ##### 使用方法
 
