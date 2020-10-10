@@ -3,7 +3,12 @@
   "version": "1.0.0",
   "description": "vx-refactor 简化原生 vuex 的复杂操作.",
   "main": "lib/index.js",
+  "homepage": "https://github.com/cpg0525/vx-refactor",
+  "bugs": {
+    "url": "https://github.com/cpg0525/vx-refactor/issues"
+  },
   "scripts": {
+    "build": "tsc",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [
