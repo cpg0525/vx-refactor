@@ -1,0 +1,22 @@
+{
+  "name": "vx-refactor",
+  "version": "1.0.0",
+  "description": "vx-refactor 简化原生 vuex 的复杂操作.",
+  "main": "lib/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "vue",
+    "vuex",
+    "vuex工具",
+    "refactor",
+    "vx-refactor",
+    "按需加载"
+  ],
+  "author": "Pengo",
+  "license": "MIT",
+  "devDependencies": {
+    "typescript": "^4.0.3"
+  }
+}
