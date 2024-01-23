@@ -81,8 +81,6 @@
       introduce() {
         // 支持选传第二个参数options。允许在命名空间模块里分发根的 action
         models.setCount(2) || models.setCount(2, {root: true});
-
-        // 支持选传第二个参数options。允许在命名空间模块里分发根的 action
         models.commit.addCount(3）|| models.commit.addCount(3, {root: true});
       }
    }
@@ -90,4 +88,4 @@
   ```
 
   <mark style="font-size:16px;font-weight:600">写在最后：</mark>
-  <p style="font-size: 14px">使用vuex，在模块注入及调用上需要遵守vuex约定的方式。eg：this.$store.commit or this.$store.dispatch。而vx-refactor只关注模块中的方法，直接采用内置暴露对象models进行调用。eg: models.setFn。且对于命名空间需手动开启namespaced: true 引入时需再次为模块的具名。而vx-refactor对命名空间模块已由内置connect方法进行处理。只需在模块中export一个空间名称即可。使其实现真正意义上的“模块化”</p>
+  <p style="font-size: 14px">使用vuex，在模块注入及调用上需要遵守vuex约定的方式。eg：this.$store.commit or this.$store.dispatch。而vx-refactor只关注模块中的方法，直接采用内置暴露对象models进行调用。eg: models.setFn。vx-refactor中connect方法实现了真正的按需引入。换句话说：不论你的model层写在何处，只要你调用connect方法对你的model进行处理。那么它将自动引入到store中进行管理。且对于命名空间需手动开启namespaced: true 引入时需再次为模块的具名。而vx-refactor只需在模块中export一个空间名称即可实现全局或私有模块的识别并支持分别调用。使其实现真正意义上的“模块化”。</p>
