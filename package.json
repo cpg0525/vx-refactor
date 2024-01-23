@@ -1,7 +1,7 @@
 {
   "name": "vx-refactor",
-  "version": "1.0.2",
-  "description": "vx-refactor 简化原生 vuex 的复杂操作.",
+  "version": "1.0.4",
+  "description": "【vx-refactor】简化原生 vuex 的复杂操作.",
   "main": "lib/index.js",
   "homepage": "https://github.com/cpg0525/vx-refactor",
   "bugs": {
@@ -17,11 +17,17 @@
     "vuex工具",
     "refactor",
     "vx-refactor",
-    "按需加载"
+    "按需加载",
+    "面向对象调用",
+    "私有模块处理"
   ],
   "author": "Pengo",
   "license": "MIT",
   "devDependencies": {
     "typescript": "^4.0.3"
+  },
+  "dependencies": {
+    "deepmerge": "^4.2.2",
+    "shvl": "^2.0.3"
   }
 }

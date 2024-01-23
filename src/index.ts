@@ -1,3 +1,10 @@
+import merge from "deepmerge";
+import * as shvl from "shvl";
+interface Storage {
+  getItem: (key: string) => any;
+  setItem: (key: string, value: any) => void;
+  removeItem: (key: string) => void;
+}
 let _store: Store;
 
 interface Module { }
@@ -10,6 +17,8 @@ interface Icommon {
 interface Store extends Icommon {
   registerModule: (path: string | Array<string>, module: Module, options?: Object) => any;
   unregisterModule: (path: string | Array<string>) => any;
+  hasModule(path: string | Array<string>): boolean
+  replaceState(state: Object)
 }
 
 interface Context extends Icommon {
@@ -27,20 +36,70 @@ interface Result<K> {
     [P in keyof K]: K[P];
   };
 }
-
+interface CacheOptions {
+  key?: string;
+  paths?: string[];
+  reducer?: (state: object, paths: string[]) => object;
+  subscriber?: (
+    store: Store
+  ) => (handler: (mutation: any, state: object) => void) => void;
+  storage?: Storage;
+  getState?: (key: string, storage: Storage) => any;
+  setState?: (key: string, state: any, storage: Storage) => void;
+  assertStorage?: (storage: Storage) => void | Error;
+  overwrite?: boolean;
+}
 export const connect = <T extends Actions, K extends Mutations>({
   ns,
   getters,
   mutations,
   actions,
-  state
+  state,
+  cache,
+  cacheOptions
 }: {
   ns: string;
   getters?: object;
   mutations?: K;
   actions: T;
   state?: object;
+  cacheOptions?: CacheOptions,
+  cache?: boolean;
 }): T | Result<K> => {
+  cacheOptions = cacheOptions || {};
+  const storage = cacheOptions.storage || (window && window.localStorage);
+  const key = cacheOptions.key || ns;
+
+  function getState(key, storage) {
+    const value = storage.getItem(key);
+
+    try {
+      return (typeof value !== "undefined")
+        ? JSON.parse(value)
+        : undefined;
+    } catch (err) { }
+
+    return undefined;
+  }
+
+  function setState(key, state, storage) {
+    return storage.setItem(key, JSON.stringify(state));
+  }
+
+  function reducer(state, paths) {
+    return Array.isArray(paths)
+      ? paths.reduce(function (substate, path) {
+        return shvl.set(substate, path, shvl.get(state, path));
+      }, {})
+      : state;
+  }
+
+  function subscriber(store) {
+    return function (handler) {
+      return store.subscribe(handler);
+    };
+  }
+
   if (_store) {
     if (!ns || !actions) {
       throw new Error("ns(命名空间) 和 actions(方法集合) 字段为必传哦~");
@@ -66,9 +125,9 @@ export const connect = <T extends Actions, K extends Mutations>({
       };
     });
 
-    const _state = _store.state[ns] || state || {};
+    const _state = _store.hasModule(ns) || state || {};
 
-    if (_store.state[ns]) {
+    if (_store.hasModule(ns)) {
       _store.unregisterModule(ns);
     }
     _store.registerModule(ns, {
@@ -78,9 +137,30 @@ export const connect = <T extends Actions, K extends Mutations>({
       state: _state,
       getters: getters || {}
     });
+    if (cache) {
+      (cacheOptions.subscriber || subscriber)(_store)(function (mutation, state) {
+        if (mutation) {
+          (cacheOptions.setState || setState)(
+            key,
+            (cacheOptions.reducer || reducer)(state, [ns]),
+            storage
+          );
+        }
+      });
+      let savedState = (() => (cacheOptions.getState || getState)(key, storage))();
+
+      if (typeof savedState === "object" && savedState !== null) {
+        _store.replaceState(
+          cacheOptions.overwrite
+            ? savedState
+            : merge(_store.state, savedState)
+        );
+      }
+    }
+
     return methods;
   } else {
-    throw new Error("请先调用vx-refactor(store)进行初始化哦~");
+    throw new Error("请先调用vx-refactor(store)进行初始化~");
   }
 };
 
